@@ -1,6 +1,7 @@
 # SudoBox Installer
 
 ### Minimum Specs and Requirements
+
 <ol>
 <li>Stable: Ubuntu 18/20/21</li>
 <li>CPU 2 Cores or 2 VCores</li>
@@ -11,12 +12,17 @@
 <li>Cloudflare account free tier <a href=https://www.cloudflare.com/en-gb/plans/free/>SignUp</a></li>
 </ol>
 
-### PRE-INSTALLATION 
+### PRE-INSTALLATION
+
 To begin your journey with Sudobox.io and execute the installation process you can type or paste the command below:
 
-``` curl -fsSl https://raw.githubusercontent.com/sudobox-io/sb-install/master/install.sh | sudo bash && source ~/.bashrc && sb ```
+```
+sudo apt update
+sudo apt install curl
+curl -fsSl https://raw.githubusercontent.com/sudobox-io/sb-install/master/install.sh | sudo bash && sb
+```
 
-have the following information handy to speed up your installation: 
+have the following information handy to speed up your installation:
 
 <ol>
 <li>Cloudflare Email</li>
@@ -26,10 +32,12 @@ have the following information handy to speed up your installation:
 
 ![SudoBox Preinstaller!](./sb-installer.png "SB-preinstaller")
 
-### NOTICE 
-Sudobox is underway with features to be added on a weekly basis therefore all documentation, container images and code are subject to change. 
+### NOTICE
 
-### Support 
+Sudobox is underway with features to be added on a weekly basis therefore all documentation, container images and code are subject to change.
+
+### Support
+
 Looking for more information please visit our docs <a href="https://docs.sudobox.io">https://docs.sudobox.io</a>
 
-If you are looking for help our discord and Forum members are ready to lend a Hand..  <a href="https://sudobox.io">Sudobox</a>
+If you are looking for help our discord and Forum members are ready to lend a Hand.. <a href="https://sudobox.io">Sudobox</a>

@@ -1,9 +1,15 @@
 #!/bin/bash
-# Owner : SudoBox-IO
-# https://sudobox.io
-#
+#########################################################################
+# Title:         SudoBox: Install Script                                #
+# Author(s):     demondamz, Xarritomi, Xpl0yt91, hawkinzzz, salty       #
+# URL:           https://github.com/sudobox-io/sb-install               #
+# --                                                                    #
+#########################################################################
+#                   GNU General Public License v3.0                     #
+#########################################################################
+
 clear
-function installation () {
+function installation() {
     echo -e "\e[36m--------------- Sudobox Installer ---------------"
     echo "  Pre Installer for SudoBox.io "
     echo "  Version 0.0.1 "
@@ -28,7 +34,7 @@ function installation () {
     checkIfSudo
 }
 
-function checkIfSudo () {
+function checkIfSudo() {
     if [ "$EUID" -ne 0 ]; then
         echo -e "\e[91mError, Please run as root, exiting...."
         exit
@@ -37,7 +43,6 @@ function checkIfSudo () {
         createdir
         downloadDependencies
         dockernetworkcheckpublic
-        dockernetworkcheck
         installsbbackend
         installsbcli
         echo ""
@@ -49,24 +54,22 @@ function checkIfSudo () {
     
 }
 
-function downloadDependencies () {
+function downloadDependencies() {
     echo -e "\e[39mInstalling and ensuring your system is upto date"
-    sudo apt-get -qq update -y && sudo apt-get -qq upgrade -y
+    sudo apt-get -qq update -y || { echo "Could not successfully run apt update"; exit 1; }
+    sudo apt-get -qq upgrade -y || { echo "Could not successfully run apt upgrade"; exit 1; }
     echo -e "\e[39mProceeding with installation dependencies..."
     
     if [[ $(which docker) && $(docker --version) ]]; then
         echo -e "\e[39mDocker Installed, Skipping..."
     else
         echo -e "\e[39mInstalling Docker"
-        sudo apt-get update
-        sudo apt-get install sudo apt-transport-https ca-certificates curl gnupg lsb-release -y
-        curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
-        $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-        sudo apt-get update
-        sudo apt-get install docker-ce docker-ce-cli containerd.io -y
+        sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+        sudo apt install docker-ce -y
         sudo groupadd docker
-        sudo usermod -aG docker $USER
+        sudo usermod -aG docker "$USER"
         newgrp docker
     fi
     
@@ -79,43 +82,32 @@ function downloadDependencies () {
     fi
 }
 
-function createdir () {
-    mkdir -p /opt/sudobox/configs
-    mkdir -p /opt/sudobox/appdata
-    mkdir -p /opt/sudobox/compose
-    touch /opt/sudobox/configs/cli-settings.yml # Sudobox CLI Config file storing settings
+function createdir() {
+    mkdir -p /opt/sudobox/{configs,appdata,compose} || { echo "Could not create sudobox directories"; exit 1; }
+    touch /opt/sudobox/configs/cli-settings.yml || { echo "Could create sudobox CLI config file"; exit 1; }
     echo -e "\e[39mCreated SudoBox Directories"
-    
 }
-function dockernetworkcheckpublic () {
-    donetcheck=$(docker network ls | grep --only-matching sudobox | head -1)
-    if [[ "$donetcheck" == "sudobox" ]]; then
+
+function dockernetworkcheckpublic() {
+    sudobox_network_exists=$(docker network ls | grep -w sudobox)
+    if [[ "$sudobox_network_exists" ]]; then
         echo -e "\e[39mDocker Network ( sudobox )Exists, Skipping..."
     else
         echo -e "\e[39mCreating Docker Network sudobox"
-        docker network create sudobox
+        docker network create sudobox || { echo "Could not create sudobox Docker Network"; exit 1; }
         echo -e "\e[39mCreated Docker Network sudobox"
     fi
 }
-function dockernetworkcheck () {
-    donetcheck=$(docker network ls | grep --only-matching sudobox_private)
-    if [[ "$donetcheck" == "sudobox_private" ]]; then
-        echo -e "\e[39mDocker Network ( sudobox_private )Exists, Skipping..."
-    else
-        echo -e "\e[39mCreating Docker Network sudobox_private"
-        docker network create sudobox_private
-        echo -e "\e[39mCreated Docker Network sudobox_private"
-    fi
-}
-function installsbcli () {
-    echo "docker run -it --network=sudobox_private -v /opt/sudobox/configs:/configs --rm --name sb-cli ghcr.io/sudobox-io/sb-cli && clear" >> /bin/sudobox
-    sudo chmod a+x /bin/sudobox
-    echo "docker run -it --network=sudobox_private -v /opt/sudobox/configs:/configs --rm --name sb-cli ghcr.io/sudobox-io/sb-cli && clear" >> /bin/sb
-    sudo chmod a+x /bin/sb
+
+function installsbcli() {
+    echo "docker run -it --network=sudobox_private -v /opt/sudobox/configs:/configs --rm --name sb-cli ghcr.io/sudobox-io/sb-cli && clear" >> /usr/local/bin/sudobox
+    sudo chmod a+x /usr/local/bin/sudobox
+    echo "docker run -it --network=sudobox_private -v /opt/sudobox/configs:/configs --rm --name sb-cli ghcr.io/sudobox-io/sb-cli && clear" >> /usr/local/bin/sb
+    sudo chmod a+x /usr/local/bin/sb
 }
 
-function installsbbackend () {
-    cd /opt/sudobox/compose
+function installsbbackend() {
+    cd /opt/sudobox/compose || { echo "Could not change directory to /opt/sudobox/compose"; exit 1; }
     echo 'version: "3.5"
 services:
   sb_backend:
@@ -126,7 +118,7 @@ services:
       - "/opt/sudobox/appdata:/appdata"
       - "/opt/sudobox/configs:/configs"
       - "/opt/sudobox/compose:/compose"
-      - "/root/.docker:/root./docker"
+      - "/root/.docker:/root/.docker"
     networks:
       - sudobox_private
     depends_on:
@@ -143,10 +135,9 @@ services:
 networks:
   sudobox_private:
     driver: bridge
-    external: true' >sb-backend.yml
+    name: sudobox_private' >sb-backend.yml || { echo "Could not create SudoBox backend compose file"; exit 1; }
     echo -e "\e[39mCreated SudoBox backend compose file"
-    docker-compose -f sb-backend.yml up -d
-    echo "Created SudoBox backend Continaer"
+    docker-compose -f sb-backend.yml up -d && echo "Created SudoBox backend Container"
 }
 
 installation
