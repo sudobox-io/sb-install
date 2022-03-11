@@ -75,7 +75,7 @@ function downloadDependencies() {
     fi
 
     sudo usermod -aG docker "$install_user"
-    
+
     if [[ $(which docker-compose) ]]; then
         echo -e "\e[39mDocker-Compose installed, Skipping..."
     else
@@ -111,6 +111,7 @@ function installsbcli() {
 
 function installsbbackend() {
     cd /opt/sudobox/compose || { echo "Could not change directory to /opt/sudobox/compose"; exit 1; }
+    rm -rf /opt/sudobox/compose/sb-backend.yml
     echo 'version: "3.5"
 services:
   sb_backend:
@@ -140,7 +141,8 @@ networks:
     driver: bridge
     name: sudobox_private' >sb-backend.yml || { echo "Could not create SudoBox backend compose file"; exit 1; }
     echo -e "\e[39mCreated SudoBox backend compose file"
-    docker-compose pull && docker-compose -f sb-backend.yml up -d && echo "Created SudoBox backend Container"
+    docker-compose -f sb-backend.yml pull && docker-compose -f sb-backend.yml up -d && echo "Created SudoBox backend Container"
+    sudo exec su -l "$install_user"
 }
 
 installation
