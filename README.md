@@ -28,7 +28,8 @@ To begin your journey with Sudobox, you can execute the installation process by 
 ```
 sudo apt update
 sudo apt install curl
-curl -fsSl https://raw.githubusercontent.com/sudobox-io/sb-install/master/install.sh | sudo bash && sb
+curl -fsSl https://raw.githubusercontent.com/sudobox-io/sb-install/master/install.sh | sudo bash && exec sudo su -l ${SUDO_USER:-$USER}
+sb
 ```
 
 have the following information handy to speed up your installation:
