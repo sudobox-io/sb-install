@@ -69,7 +69,7 @@ function downloadDependencies() {
         sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
         sudo apt install docker-ce -y
         sudo groupadd docker
-        sudo usermod -aG docker "$USER"
+        sudo usermod -aG docker "${SUDO_USER:-$USER}"
         newgrp docker
     fi
     
