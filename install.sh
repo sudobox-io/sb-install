@@ -9,6 +9,8 @@
 #########################################################################
 
 clear
+install_user=${SUDO_USER:-$USER}
+
 function installation() {
     echo -e "\e[36m--------------- Sudobox Installer ---------------"
     echo "  Pre Installer for SudoBox.io "
@@ -69,7 +71,7 @@ function downloadDependencies() {
         sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
         sudo apt install docker-ce -y
         sudo groupadd docker
-        sudo usermod -aG docker "${SUDO_USER:-$USER}"
+        sudo usermod -aG docker "$install_user"
         newgrp docker
     fi
     
