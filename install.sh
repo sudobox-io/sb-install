@@ -71,9 +71,10 @@ function downloadDependencies() {
         sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
         sudo apt install docker-ce -y
         sudo groupadd docker
-        sudo usermod -aG docker "$install_user"
         newgrp docker
     fi
+
+    sudo usermod -aG docker "$install_user"
     
     if [[ $(which docker-compose) ]]; then
         echo -e "\e[39mDocker-Compose installed, Skipping..."
