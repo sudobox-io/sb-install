@@ -122,67 +122,40 @@ function installsbbackend() {
     grep -w avx /proc/cpuinfo &>/dev/null
     if [ $? -eq 1 ]; then
         echo -e "\e[32mCPU does not support AVX, installing MongoDB V4"
-        echo 'version: "3.5"
-services:
-  sb_backend:
-    image: ghcr.io/sudobox-io/sb-backend
-    container_name: sb-backend
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "/opt/sudobox/appdata:/appdata"
-      - "/opt/sudobox/configs:/configs"
-      - "/opt/sudobox/compose:/compose"
-      - "/root/.docker:/root/.docker"
-    networks:
-      - sudobox_private
-    depends_on:
-      - sb_database
-
-  sb_database:
-    image: mongo:4.4.13
-    container_name: sb-database
-    volumes:
-      - "/opt/sudobox/appdata/sbdb:/data/db"
-    networks:
-      - sudobox_private
-
-networks:
-  sudobox_private:
-    driver: bridge
-    name: sudobox_private' >sb-backend.yml || { echo "Could not create SudoBox backend compose file"; exit 1; }
-        echo -e "\e[39mCreated SudoBox backend compose file"
+        mongodb_version=4.4.13
     else
         echo -e "\e[32mCPU supports AVX, installing MongoDB V5"
-        echo 'version: "3.5"
+        mongodb_version=latest
+    fi
+    echo "version: \"3.5\"
 services:
   sb_backend:
     image: ghcr.io/sudobox-io/sb-backend
     container_name: sb-backend
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "/opt/sudobox/appdata:/appdata"
-      - "/opt/sudobox/configs:/configs"
-      - "/opt/sudobox/compose:/compose"
-      - "/root/.docker:/root/.docker"
+      - \"/var/run/docker.sock:/var/run/docker.sock\"
+      - \"/opt/sudobox/appdata:/appdata\"
+      - \"/opt/sudobox/configs:/configs\"
+      - \"/opt/sudobox/compose:/compose\"
+      - \"/root/.docker:/root/.docker\"
     networks:
       - sudobox_private
     depends_on:
       - sb_database
 
   sb_database:
-    image: mongo:latest
+    image: mongo:$mongodb_version
     container_name: sb-database
     volumes:
-      - "/opt/sudobox/appdata/sbdb:/data/db"
+      - \"/opt/sudobox/appdata/sbdb:/data/db\"
     networks:
       - sudobox_private
 
 networks:
   sudobox_private:
     driver: bridge
-    name: sudobox_private' >sb-backend.yml || { echo "Could not create SudoBox backend compose file"; exit 1; }
-        echo -e "\e[39mCreated SudoBox backend compose file"
-    fi
+    name: sudobox_private" >sb-backend.yml || { echo "Could not create SudoBox backend compose file"; exit 1; }
+    echo -e "\e[39mCreated SudoBox backend compose file"
     docker-compose -f sb-backend.yml pull && docker-compose -f sb-backend.yml up -d && echo "Created SudoBox backend Container"
 }
 
