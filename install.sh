@@ -35,7 +35,7 @@ function downloadDependencies() {
     sudo apt-get -qq update -y || { echo "Could not successfully run apt update"; exit 1; }
     sudo apt-get -qq upgrade -y || { echo "Could not successfully run apt upgrade"; exit 1; }
     echo -e "\e[39mProceeding with installation dependencies..."
-    case "`/usr/bin/lsb_release -si`" in
+    case "$(/usr/bin/lsb_release -si)" in
         Ubuntu) dockerUbuntu ;;
         Debian) dockerDebian ;;
         *) echo 'You are using an unsupported operating system. Please check the guide for a suitable OS.'; exit ;;
@@ -75,7 +75,7 @@ function dockerDebian() {
 }
 
 function dockerCompose() {
-    dockerComposeV1="$(echo https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m))"
+    dockerComposeV1="https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)"
     dockerComposeV2="$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r ".assets[] | select(.name | contains(\"sha256\") | not) | select(.name | test(\"docker-compose-linux-x86_64\")) | .browser_download_url")"
     if [[ $(which docker-compose) ]]; then
         echo -e "\e[39mDocker-Compose installed, Skipping..."
