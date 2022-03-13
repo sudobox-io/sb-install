@@ -46,7 +46,8 @@ function dockerUbuntu() {
     if [[ $(which docker) && $(docker --version) ]]; then
         echo -e "\e[39mDocker Installed, Skipping..."
     else
-        echo -e "\e[39mInstalling Docker for Ubuntu"
+        echo -e "\e[32mInstalling Docker for Ubuntu"
+        echo -e "\e[39mPlease be patient"
         sudo apt install apt-transport-https ca-certificates curl software-properties-common jq -y
         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
         sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
@@ -61,7 +62,8 @@ function dockerDebian() {
     if [[ $(which docker) && $(docker --version) ]]; then
         echo -e "\e[39mDocker Installed, Skipping..."
     else
-        echo -e "\e[39mInstalling Docker for Debian"
+        echo -e "\e[32mInstalling Docker for Debian"
+        echo -e "\e[39mPlease be patient"
         sudo apt-get install sudo apt-transport-https ca-certificates curl gnupg lsb-release jq -y
         curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
@@ -117,7 +119,10 @@ function installsbcli() {
 
 function installsbbackend() {
     cd /opt/sudobox/compose || { echo "Could not change directory to /opt/sudobox/compose"; exit 1; }
-    echo 'version: "3.5"
+    grep -w avx /proc/cpuinfo &>/dev/null
+    if [ $? -eq 1 ]; then
+        echo -e "\e[32mCPU does not support AVX, installing MongoDB V4"
+        echo 'version: "3.5"
 services:
   sb_backend:
     image: ghcr.io/sudobox-io/sb-backend
@@ -145,7 +150,39 @@ networks:
   sudobox_private:
     driver: bridge
     name: sudobox_private' >sb-backend.yml || { echo "Could not create SudoBox backend compose file"; exit 1; }
-    echo -e "\e[39mCreated SudoBox backend compose file"
+        echo -e "\e[39mCreated SudoBox backend compose file"
+    else
+        echo -e "\e[32mCPU supports AVX, installing MongoDB V5"
+        echo 'version: "3.5"
+services:
+  sb_backend:
+    image: ghcr.io/sudobox-io/sb-backend
+    container_name: sb-backend
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/opt/sudobox/appdata:/appdata"
+      - "/opt/sudobox/configs:/configs"
+      - "/opt/sudobox/compose:/compose"
+      - "/root/.docker:/root/.docker"
+    networks:
+      - sudobox_private
+    depends_on:
+      - sb_database
+
+  sb_database:
+    image: mongo:latest
+    container_name: sb-database
+    volumes:
+      - "/opt/sudobox/appdata/sbdb:/data/db"
+    networks:
+      - sudobox_private
+
+networks:
+  sudobox_private:
+    driver: bridge
+    name: sudobox_private' >sb-backend.yml || { echo "Could not create SudoBox backend compose file"; exit 1; }
+        echo -e "\e[39mCreated SudoBox backend compose file"
+    fi
     docker-compose -f sb-backend.yml pull && docker-compose -f sb-backend.yml up -d && echo "Created SudoBox backend Container"
 }
 
