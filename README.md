@@ -1,29 +1,20 @@
-SudoBox
-
-You will need to install as the root user.
+# SudoBox Installer
 
 ### Minimum Specs and Requirements
 
 <ol>
-<li>A VPS/VM or dedicated server supporting the following:</li>
-<li>Ubuntu 18/20/21</li>
-<li>2 CPU Cores or 2 VCPU Cores</li>
-<li>2GB Ram</li>
-<li>40GB Disk Space</li>
+<li>Stable: Ubuntu 18/20/21</li>
+<li>CPU 2 Cores or 2 VCores</li>
+<li>4GB Ram</li>
+<li>20GB Disk Space</li>
+<li>A VPS/VM or Dedicated Server</li>
 <li>An existing domain or buy a new one from namecheap</li>
-<li>Cloudflare account free tier <a href=https://www.cloudflare.com/en-gb/plans/free/>Sign Up</a></li>
+<li>Cloudflare account free tier <a href=https://www.cloudflare.com/en-gb/plans/free/>SignUp</a></li>
 </ol>
 
-### INSTALLATION
+### PRE-INSTALLATION
 
-We recommend you have the following information to hand to help speed up your installation:
-
-<ol>
-<li>You will need your CloudFlare email address</li>
-<li>Copy your Cloudflare Global API --> Find it here. <a href=https://developers.cloudflare.com/api/keys/#view-your-api-key/>Global API</a></li>
-</ol>
-
-To begin your journey with Sudobox, you can execute the installation process by typing or pasting the command below:
+To begin your journey with Sudobox.io and execute the installation process you can type or paste the command below:
 
 ```
 sudo apt update
@@ -48,6 +39,6 @@ Sudobox is underway with features to be added on a weekly basis therefore all do
 
 ### Support
 
-For more indepth guides please visit our documentation <a href="https://docs.sudobox.io">https://docs.sudobox.io</a>
+Looking for more information please visit our docs <a href="https://docs.sudobox.io">https://docs.sudobox.io</a>
 
-If you are looking for help our discord and Forum members are ready to lend a hand.. <a href="https://sudobox.io">Sudobox</a>
+If you are looking for help our discord and Forum members are ready to lend a Hand.. <a href="https://sudobox.io">Sudobox</a>
