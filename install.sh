@@ -32,8 +32,8 @@ function checkIfSudo() {
 
 function downloadDependencies() {
     echo -e "\e[39mInstalling and ensuring your system is up to date"
-    sudo apt-get -qq update -y || { echo "Could not successfully run apt update"; exit 1; }
-    sudo apt-get -qq upgrade -y || { echo "Could not successfully run apt upgrade"; exit 1; }
+    apt-get -qq update -y || { echo "Could not successfully run apt update"; exit 1; }
+    apt-get -qq upgrade -y || { echo "Could not successfully run apt upgrade"; exit 1; }
     echo -e "\e[39mProceeding with installation dependencies..."
     case "$(/usr/bin/lsb_release -si)" in
         Ubuntu) dockerUbuntu ;;
@@ -43,35 +43,35 @@ function downloadDependencies() {
 }
 
 function dockerUbuntu() {
+    apt install apt-transport-https ca-certificates curl software-properties-common jq -y
     if [[ $(which docker) && $(docker --version) ]]; then
         echo -e "\e[39mDocker Installed, Skipping..."
     else
         echo -e "\e[32mInstalling Docker for Ubuntu"
         echo -e "\e[39mPlease be patient"
-        sudo apt install apt-transport-https ca-certificates curl software-properties-common jq -y
         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-        sudo apt install docker-ce -y
+        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        apt install docker-ce -y
         echo -e "\e[39mDocker Installed"
-        sudo usermod -aG docker "$install_user"
+        usermod -aG docker "$install_user"
     fi
     dockerCompose
 }
 
 function dockerDebian() {
+    apt-get install sudo apt-transport-https ca-certificates curl gnupg lsb-release jq -y
     if [[ $(which docker) && $(docker --version) ]]; then
         echo -e "\e[39mDocker Installed, Skipping..."
     else
         echo -e "\e[32mInstalling Docker for Debian"
         echo -e "\e[39mPlease be patient"
-        sudo apt-get install sudo apt-transport-https ca-certificates curl gnupg lsb-release jq -y
         curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
         $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-        sudo apt-get update
-        sudo apt-get install docker-ce docker-ce-cli containerd.io -y
+        apt-get update
+        apt-get install docker-ce docker-ce-cli containerd.io -y
         echo -e "\e[39mDocker Installed"
-        sudo usermod -aG docker "$install_user"
+        usermod -aG docker "$install_user"
     fi
     dockerCompose
 }
@@ -83,8 +83,8 @@ function dockerCompose() {
         echo -e "\e[39mDocker-Compose installed, Skipping..."
     else
         echo -e "\e[39mInstalling docker-compose v1"
-        sudo curl -L "$dockerComposeV1" -o /usr/local/bin/docker-compose
-        sudo chmod +x /usr/local/bin/docker-compose
+        curl -L "$dockerComposeV1" -o /usr/local/bin/docker-compose
+        chmod +x /usr/local/bin/docker-compose
         echo -e "\e[39mInstalling docker-compose v2"
         mkdir -p /usr/local/lib/docker/cli-plugins
         curl -SL "$dockerComposeV2" -o /usr/local/lib/docker/cli-plugins/docker-compose
@@ -111,7 +111,7 @@ function dockernetworkcheckpublic() {
 
 function installsbcli() {
     echo "docker run -it --network=sudobox_private -v /opt/sudobox/configs:/configs --rm --name sb-cli ghcr.io/sudobox-io/sb-cli && clear" | tee /usr/local/bin/{sudobox,sb}
-    sudo chmod a+x /usr/local/bin/{sudobox,sb}
+    chmod a+x /usr/local/bin/{sudobox,sb}
     docker pull ghcr.io/sudobox-io/sb-cli
 }
 
