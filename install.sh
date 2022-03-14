@@ -110,7 +110,7 @@ function dockernetworkcheckpublic() {
 }
 
 function installsbcli() {
-    echo "docker run -it --network=sudobox_private -v /opt/sudobox/configs:/configs --rm --name sb-cli ghcr.io/sudobox-io/sb-cli && clear" | tee /usr/local/bin/{sudobox,sb}
+    echo "docker run -it --network=sudobox_private -v /opt/sudobox/configs:/configs --rm --name sb-cli ghcr.io/sudobox-io/sb-cli && clear" | tee /usr/local/bin/{sudobox,sb} &>/dev/null
     chmod a+x /usr/local/bin/{sudobox,sb}
     docker pull ghcr.io/sudobox-io/sb-cli
 }
