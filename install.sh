@@ -64,10 +64,10 @@ function installDocker() {
     else
         echo -e "\e[32mInstalling Docker for ${OS^u}"
         echo -e "\e[39mPlease be patient"
-        curl -fsSL "https://download.docker.com/linux/$OS/gpg" | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+        curl -fsSL "https://download.docker.com/linux/$OS/gpg" | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg --yes
         echo \
           "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/$OS $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-        apt-get update
+        apt-get update -y
         apt-get install docker-ce docker-ce-cli containerd.io -y
         echo -e "\e[39mDocker Installed"
         usermod -aG docker "$install_user"
