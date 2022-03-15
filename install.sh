@@ -78,7 +78,7 @@ function installDocker() {
 function dockerCompose() {
     arch="$(uname -m)"
     dockerComposeV2="$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r ".assets[] | select(.name | contains(\"sha256\") | not) | select(.name | test(\"docker-compose-linux-$arch\")) | .browser_download_url")"
-    if [[ $(which docker-compose) ]]; then
+    if [[ $(docker compose version &>/dev/null) ]]; then
         echo -e "\e[39mDocker-Compose installed, Skipping..."
     else
         echo -e "\e[39mInstalling docker-compose v2"
