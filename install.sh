@@ -81,9 +81,6 @@ function dockerCompose() {
     if [[ $(which docker-compose) ]]; then
         echo -e "\e[39mDocker-Compose installed, Skipping..."
     else
-        echo -e "\e[39mInstalling docker-compose v1"
-        curl -L --fail https://github.com/docker/compose/releases/download/1.29.2/run.sh -o /usr/local/bin/docker-compose
-        chmod +x /usr/local/bin/docker-compose
         echo -e "\e[39mInstalling docker-compose v2"
         mkdir -p /usr/local/lib/docker/cli-plugins
         curl -SL "$dockerComposeV2" -o /usr/local/lib/docker/cli-plugins/docker-compose
@@ -153,7 +150,7 @@ networks:
     driver: bridge
     name: sudobox_private" >sb-backend.yml || { echo "Could not create SudoBox backend compose file"; exit 1; }
     echo -e "\e[39mCreated SudoBox backend compose file"
-    docker-compose -f sb-backend.yml pull && docker-compose -f sb-backend.yml up -d && echo "Created SudoBox backend Container"
+    docker compose -f sb-backend.yml pull && docker-compose -f sb-backend.yml up -d && echo "Created SudoBox backend Container"
 }
 
 checkIfSudo
