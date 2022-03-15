@@ -150,7 +150,7 @@ networks:
     driver: bridge
     name: sudobox_private" >sb-backend.yml || { echo "Could not create SudoBox backend compose file"; exit 1; }
     echo -e "\e[39mCreated SudoBox backend compose file"
-    docker compose -f sb-backend.yml pull && docker-compose -f sb-backend.yml up -d && echo "Created SudoBox backend Container"
+    docker compose -f sb-backend.yml pull && docker compose -f sb-backend.yml up -d && echo "Created SudoBox backend Container"
 }
 
 checkIfSudo
