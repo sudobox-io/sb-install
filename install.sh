@@ -38,7 +38,7 @@ function downloadDependencies() {
     case "$(/usr/bin/lsb_release -si)" in
         Ubuntu) installDocker "Ubuntu" ;;
         Debian) installDocker "Debian" ;;
-        *) echo 'You are using an unsupported operating system. Please check the guide for a suitable OS.'; exit ;;
+        *) echo 'You are using an unsupported operating system. Please check the guide for a suitable OS.'; exit 1 ;;
     esac
 }
 
@@ -78,7 +78,7 @@ function installDocker() {
 function dockerCompose() {
     arch="$(uname -m)"
     dockerComposeV2="$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r ".assets[] | select(.name | contains(\"sha256\") | not) | select(.name | test(\"docker-compose-linux-$arch\")) | .browser_download_url")"
-    if [[ $(docker compose version &>/dev/null) ]]; then
+    if test -f /usr/local/lib/docker/cli-plugins/docker-compose; then
         echo -e "\e[39mDocker-Compose installed, Skipping..."
     else
         echo -e "\e[39mInstalling docker-compose v2"
