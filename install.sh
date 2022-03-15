@@ -66,8 +66,7 @@ function installDocker() {
         echo -e "\e[39mPlease be patient"
         curl -fsSL "https://download.docker.com/linux/$OS/gpg" | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
         echo \
-          "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/$OS \
-          $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/$OS $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
         apt-get update
         apt-get install docker-ce docker-ce-cli containerd.io -y
         echo -e "\e[39mDocker Installed"
