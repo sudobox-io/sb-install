@@ -46,11 +46,11 @@ function installDocker() {
     case "$1" in
         Ubuntu)
           OS=ubuntu
-          apt_packages="apt-transport-https ca-certificates curl software-properties-common jq"
+          apt_packages="apt-transport-https ca-certificates curl software-properties-common gnupg lsb-release jq"
           ;;
         Debian)
           OS=debian
-          apt_packages="sudo apt-transport-https ca-certificates curl gnupg lsb-release jq"
+          apt_packages="apt-transport-https ca-certificates curl software-properties-common gnupg lsb-release jq sudo"
           ;;
         *)
           echo 'You are using an unsupported operating system. Please check the guide for a suitable OS.'; exit 1
@@ -76,13 +76,13 @@ function installDocker() {
 }
 
 function dockerCompose() {
-    dockerComposeV1="https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)"
-    dockerComposeV2="$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r ".assets[] | select(.name | contains(\"sha256\") | not) | select(.name | test(\"docker-compose-linux-x86_64\")) | .browser_download_url")"
+    arch="$(uname -m)"
+    dockerComposeV2="$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r ".assets[] | select(.name | contains(\"sha256\") | not) | select(.name | test(\"docker-compose-linux-$arch\")) | .browser_download_url")"
     if [[ $(which docker-compose) ]]; then
         echo -e "\e[39mDocker-Compose installed, Skipping..."
     else
         echo -e "\e[39mInstalling docker-compose v1"
-        curl -L "$dockerComposeV1" -o /usr/local/bin/docker-compose
+        curl -L --fail https://github.com/docker/compose/releases/download/1.29.2/run.sh -o /usr/local/bin/docker-compose
         chmod +x /usr/local/bin/docker-compose
         echo -e "\e[39mInstalling docker-compose v2"
         mkdir -p /usr/local/lib/docker/cli-plugins
