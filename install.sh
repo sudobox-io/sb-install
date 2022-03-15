@@ -36,38 +36,38 @@ function downloadDependencies() {
     apt-get -qq upgrade -y || { echo "Could not successfully run apt upgrade"; exit 1; }
     echo -e "\e[39mProceeding with installation dependencies..."
     case "$(/usr/bin/lsb_release -si)" in
-        Ubuntu) dockerUbuntu ;;
-        Debian) dockerDebian ;;
+        Ubuntu) installDocker "Ubuntu" ;;
+        Debian) installDocker "Debian" ;;
         *) echo 'You are using an unsupported operating system. Please check the guide for a suitable OS.'; exit ;;
     esac
 }
 
-function dockerUbuntu() {
-    apt install apt-transport-https ca-certificates curl software-properties-common jq -y
-    if [[ $(which docker) && $(docker --version) ]]; then
-        echo -e "\e[39mDocker Installed, Skipping..."
-    else
-        echo -e "\e[32mInstalling Docker for Ubuntu"
-        echo -e "\e[39mPlease be patient"
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-        add-apt-repository "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-        apt install docker-ce -y
-        echo -e "\e[39mDocker Installed"
-        usermod -aG docker "$install_user"
-    fi
-    dockerCompose
-}
+function installDocker() {
+    case "$1" in
+        Ubuntu)
+          OS=ubuntu
+          apt_packages="apt-transport-https ca-certificates curl software-properties-common jq"
+          ;;
+        Debian)
+          OS=debian
+          apt_packages="sudo apt-transport-https ca-certificates curl gnupg lsb-release jq"
+          ;;
+        *)
+          echo 'You are using an unsupported operating system. Please check the guide for a suitable OS.'; exit 1
+          ;;
+    esac
 
-function dockerDebian() {
-    apt-get install sudo apt-transport-https ca-certificates curl gnupg lsb-release jq -y
+    # shellcheck disable=SC2086
+    apt-get install $apt_packages -y
     if [[ $(which docker) && $(docker --version) ]]; then
         echo -e "\e[39mDocker Installed, Skipping..."
     else
-        echo -e "\e[32mInstalling Docker for Debian"
+        echo -e "\e[32mInstalling Docker for ${OS^u}"
         echo -e "\e[39mPlease be patient"
-        curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
-        $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        curl -fsSL "https://download.docker.com/linux/$OS/gpg" | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+        echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/$OS \
+          $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
         apt-get update
         apt-get install docker-ce docker-ce-cli containerd.io -y
         echo -e "\e[39mDocker Installed"
